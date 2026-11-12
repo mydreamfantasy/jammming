@@ -10,14 +10,12 @@
 
 // window.location.assign(url.toString());
 const clientId = "a5c9c887361547bf9544470d7dba6fec";
-const redirectUri = "http://127.0.0.1:5173/";
+const redirectUri = "https://jammmming.netlify.app/";
 
 function generateCodeVerifier() {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
 
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join(
-    "",
-  );
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 async function generateCodeChallenge(codeVerifier) {
@@ -106,16 +104,11 @@ export async function exchangeCodeForToken() {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      data.error_description || data.error || "Ошибка авторизации",
-    );
+    throw new Error(data.error_description || data.error || "Ошибка авторизации");
   }
 
   sessionStorage.setItem("spotify_access_token", data.access_token);
-  sessionStorage.setItem(
-    "spotify_expires_at",
-    String(Date.now() + data.expires_in * 1000),
-  );
+  sessionStorage.setItem("spotify_expires_at", String(Date.now() + data.expires_in * 1000));
 
   sessionStorage.removeItem("spotify_code_verifier");
   sessionStorage.removeItem("spotify_state");
@@ -208,27 +201,21 @@ export async function savePlaylist(name, tracks) {
 
   const playlistId = playlist.id;
 
-  const itemsResponse = await fetch(
-    `https://api.spotify.com/v1/playlists/${playlistId}/items`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        uris: trackUris,
-      }),
+  const itemsResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/items`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      uris: trackUris,
+    }),
+  });
 
   const itemsData = await itemsResponse.json();
 
   if (!itemsResponse.ok) {
-    throw new Error(
-      itemsData.error?.message ||
-        "Плейлист создан, но не удалось добавить треки",
-    );
+    throw new Error(itemsData.error?.message || "Плейлист создан, но не удалось добавить треки");
   }
 
   return playlist;
